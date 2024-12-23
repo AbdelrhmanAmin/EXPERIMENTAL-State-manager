@@ -20,12 +20,10 @@ const createPastObject = (pastObject, newInstance) => {
 
 const getActionFromPast = (past, target) => {
   const _past = { ...past };
-  if (!_past[target]) {
+  if (!target) {
     // get the last one
     const keys = Object.keys(_past).sort((a, b) => b - a);
-    const lastTimeStamp = keys[0];
-    const target = _past[lastTimeStamp];
-    return target;
+    target = keys[0];
   }
   const action = _past[target];
   return action;
