@@ -1,8 +1,10 @@
 const findDiff = (prev, next) => {
   if (Array.isArray(prev) && Array.isArray(next)) {
     return findDiffBetweenArrays(prev, next);
+  } else if (typeof prev === "object" && typeof next === "object") {
+    return findDiffBetweenObjects(prev, next);
   }
-  return findDiffBetweenObjects(prev, next);
+  return next !== prev;
 };
 
 const findDiffBetweenArrays = (prev, next) => {
@@ -12,7 +14,10 @@ const findDiffBetweenArrays = (prev, next) => {
 };
 
 const findDiffBetweenObjects = (prev, next) => {
-  const keys = Object.keys(prev);
+  let keys = Object.keys(prev);
+  if (keys.length === 0) {
+    keys = Object.keys(next);
+  }
   const diff = {};
   keys.forEach((key) => {
     if (prev[key] !== next[key]) {

@@ -11,6 +11,15 @@ const Provider = ({ children, store }) => {
   );
 };
 
-const useStore = () => React.useContext(StoreContext).store;
+const useStore = () => {
+  const context = React.useContext(StoreContext);
+  if (!context) {
+    throw new Error("useStore must be used within a StoreProvider");
+  }
+  if(!context.store) {
+    throw new Error("Store is required");
+  }
+  return context.store;
+};
 
 export { Provider, useStore };

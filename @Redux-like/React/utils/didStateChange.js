@@ -1,15 +1,16 @@
-import findDiff from "./findDiff";
+
 
 const didStateChange = (prevState, selector, store) => {
   const newState = selector(store.getState());
-  const diff = findDiff(prevState, newState);
-  const hasDiff = Array.isArray(diff)
-    ? diff.length > 0
-    : Object.keys(diff).length > 0;
-  if (hasDiff) {
-    return true;
+  let shouldUpdate = false;
+  if (Array.isArray(prevState) && Array.isArray(newState)) {
+    shouldUpdate = prevState.length !== newState.length;
+  } else if (typeof prevState === "object" && typeof newState === "object") {
+    shouldUpdate = Object.keys(prevState).length !== Object.keys(newState).length;
+  } else {
+    shouldUpdate = prevState !== newState;
   }
-  return false;
+  return shouldUpdate;  
 };
 
 export default didStateChange;
