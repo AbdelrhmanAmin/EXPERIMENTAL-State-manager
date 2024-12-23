@@ -1,12 +1,15 @@
-import { connect } from "redux-like-react";
-import { store } from "./main";
+import { connect, useDispatch, useSelector } from "@Redux-like/react";
 
-const Counter = ({ onIncrement, onDecrement, count }) => {
+const Counter = () => {
+  const count = useSelector((state) => state.present.count);
+  const dispatch = useDispatch();
+  const increment = () => dispatch({ type: "INCREMENT", amount: 1 });
+  const decrement = () => dispatch({ type: "DECREMENT", amount: 1 });
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "column", 
         alignItems: "center",
         justifyContent: "start",
         marginRight: "40px",
@@ -30,23 +33,15 @@ const Counter = ({ onIncrement, onDecrement, count }) => {
           style={{
             marginRight: "10px",
           }}
-          onClick={() => onIncrement()}
+          onClick={() => increment()}
         >
           Increment
         </button>
-        <button onClick={() => count > 0 && onDecrement()}>Decrement</button>
+        <button onClick={() => count > 0 && decrement()}>Decrement</button>
       </div>
     </div>
   );
 };
 
-const mapStateToProps = (state) => ({
-  count: state.present.count,
-});
 
-const mapDispatchToProps = (dispatch) => ({
-  onIncrement: () => dispatch({ type: "INCREMENT", amount: 1 }),
-  onDecrement: () => dispatch({ type: "DECREMENT", amount: 1 }),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Counter);
+export default Counter

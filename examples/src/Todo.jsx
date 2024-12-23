@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "redux-like-react";
+import { useDispatch, useSelector } from "@Redux-like/react";
 import { useState } from "react";
 
 const Todo = () => {

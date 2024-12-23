@@ -18,57 +18,52 @@ const createPastObject = (pastObject, newInstance) => {
   };
 };
 
-// @TODO: in the future I don't want to remove, I only want to travel (preview)
 const getActionFromPast = (past, target) => {
   const _past = { ...past };
   if (!_past[target]) {
     // get the last one
-    const keys = Object.keys(_past);
-    const lastKey = keys[keys.length - 1];
-    const target = _past[lastKey];
+    const keys = Object.keys(_past).sort((a, b) => b - a);
+    const lastTimeStamp = keys[0];
+    const target = _past[lastTimeStamp];
     return target;
   }
   const action = _past[target];
   return action;
 };
 
-const removeActionFromPast = (past, target) => {
-  const _past = { ...past };
-  delete _past[target];
-  return _past;
-};
-
-const undoable = (reducer) => {
+const undoAble = (reducer) => {
   const initialState = {
     past: {},
     present: { count: 0, items: [] },
+    log: [],
+    view: "present",
   };
   return (state = initialState, action) => {
     if (!action.type) return state;
-    const { past, present } = state;
+    const { past, log } = state;
+    let present = state.present;
 
     if (action.type === "TRAVEL") {
-      let newPast = { ...past },
-        timestamp;
+      let timestamp;
       if (action.hasOwnProperty("timestamp")) {
         timestamp = action.timestamp;
-        if (action.hasOwnProperty("shouldRemove")) {
-          newPast = removeActionFromPast(past, timestamp);
-          // removing and traveling if the timestamp is the same
-          if (timestamp == present.timestamp) {
-            console.log("update!");
-            const newPresent = getActionFromPast(newPast);
-            return {
-              past: newPast,
-              present: newPresent,
-            };
-          }
-          // Only removing, not traveling.
-          return { past: newPast, present };
-        }
+      } else {
+        return state;
       }
+      const newInstance = createNewPast(present, { type: "TRAVEL" });
+      const newPast = createPastObject(past, newInstance);
       const newPresent = getActionFromPast(past, timestamp);
-      return { past: newPast, present: newPresent };
+      return { ...state, past: newPast, present: newPresent, view: "past" };
+    }
+    if (action.type === "RETURN") {
+      const lastPast = getActionFromPast(past);
+      const newPresent = state.view === "present" ? present : lastPast;
+      console.log({ past, lastPast, view: state.view });
+      return { ...state, present: newPresent, view: "present" };
+    }
+    // revert to the actual present if there were traveling.
+    if (state.view === "past") {
+      present = getActionFromPast(past);
     }
     const newPresent = reducer(present, action);
     if (present === newPresent) {
@@ -76,15 +71,24 @@ const undoable = (reducer) => {
     }
     const newInstance = createNewPast(present, action);
     const newPast = createPastObject(past, newInstance);
+    const newLog = [
+      ...state.log,
+      {
+        action: action.type,
+        timestamp: newInstance.timestamp,
+      },
+    ];
 
     return {
       past: newPast,
       present: { ...newPresent, timestamp: newInstance.timestamp },
+      log: newLog,
+      view: "present",
     };
   };
 };
 
-const rootReducer = undoable(
+const rootReducer = undoAble(
   combineReducers({
     count: counterReducer,
     items: itemsReducer,
