@@ -56,7 +56,6 @@ const undoAble = (reducer) => {
     if (action.type === "RETURN") {
       const lastPast = getActionFromPast(past);
       const newPresent = state.view === "present" ? present : lastPast;
-      console.log({ past, lastPast, view: state.view });
       return { ...state, present: newPresent, view: "present" };
     }
     // revert to the actual present if there were traveling.

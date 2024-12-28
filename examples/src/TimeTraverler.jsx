@@ -5,10 +5,6 @@ const TimeTraveler = () => {
   const history = useSelector((state) => state.log);
   // const store = useSelector((state) => state);
   const dispatch = useDispatch();
-  useEffect(() => {
-    // @Todo this is not working?
-    console.log({ history });
-  }, [history]);
   return (
     <div>
       <strong style={{ fontSize: "36px" }}>Time Traveler</strong>
